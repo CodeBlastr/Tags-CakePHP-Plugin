@@ -14,6 +14,7 @@
  *
  * @package tags
  * @subpackage tags.models
+ * @property Tagged Tagged
  */
 class Tag extends TagsAppModel {
 
