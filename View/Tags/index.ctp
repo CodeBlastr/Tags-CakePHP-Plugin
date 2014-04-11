@@ -52,6 +52,8 @@ foreach ($tags as $tag):
 		</td>
 		<td class="actions">
 			<?php echo $this->Html->link(__d('tags', 'View'), array('action' => 'view', $tag['Tag']['keyname'])); ?>
+			<?php echo $this->Html->link(__d('tags', 'Edit'), array('action' => 'edit', $tag['Tag']['id'])); ?>
+			<?php echo $this->Html->link(__d('tags', 'Delete'), array('action' => 'delete', $tag['Tag']['id']), null, sprintf(__d('tags', 'Are you sure you want to delete # %s?'), $tag['Tag']['id'])); ?>
 		</td>
 	</tr>
 <?php endforeach; ?>
@@ -61,4 +63,9 @@ foreach ($tags as $tag):
 	<?php echo $this->Paginator->prev('<< '.__d('tags', 'previous'), array(), null, array('class'=>'disabled'));?>
 	<?php echo $this->Paginator->numbers();?>
 	<?php echo $this->Paginator->next(__d('tags', 'next').' >>', array(), null, array('class' => 'disabled'));?>
+</div>
+<div class="actions">
+	<ul>
+		<li><?php echo $this->Html->link(sprintf(__d('tags', 'New %s'), __d('tags', 'Tag')), array('action' => 'add')); ?></li>
+	</ul>
 </div>

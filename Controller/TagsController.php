@@ -38,15 +38,6 @@ class TagsController extends TagsAppController {
 	);
 
 /**
- * Helpers
- *
- * @var array
- */
-	public $helpers = array(
-		//'Html', 'Form'
-	);
-
-/**
  * Index action
  *
  * @return void
@@ -66,32 +57,7 @@ class TagsController extends TagsAppController {
 		try {
 			$this->set('tag', $this->{$this->modelClass}->view($keyName));
 		} catch (Exception $e) {
-			$this->Session->setFlash($e->getMessage());
-			$this->redirect('/');
-		}
-	}
-
-/**
- * Admin Index
- *
- * @return void
- */
-	public function admin_index() {
-		$this->{$this->modelClass}->recursive = 0;
-		$this->set('tags', $this->Paginator->paginate());
-	}
-
-/**
- * Views a single tag
- *
- * @param string tag UUID
- * @return void
- */
-	public function admin_view($keyName) {
-		try {
-			$this->set('tag', $this->{$this->modelClass}->view($keyName));
-		} catch (Exception $e) {
-			$this->Session->setFlash($e->getMessage());
+			$this->Session->setFlash($e->getMessage(), 'flash_danger');
 			$this->redirect('/');
 		}
 	}
@@ -101,10 +67,10 @@ class TagsController extends TagsAppController {
  *
  * @return void
  */
-	public function admin_add() {
+	public function add() {
 		if (!empty($this->request->data)) {
 			if ($this->{$this->modelClass}->add($this->request->data)) {
-				$this->Session->setFlash(__d('tags', 'The Tags has been saved.'));
+				$this->Session->setFlash(__d('tags', 'The Tags has been saved.'), 'flash_success');
 				$this->redirect(array('action' => 'index'));
 			}
 		}
@@ -116,17 +82,17 @@ class TagsController extends TagsAppController {
  * @param string tag UUID
  * @return void
  */
-	public function admin_edit($tagId = null) {
+	public function edit($tagId = null) {
 		try {
 			$result = $this->{$this->modelClass}->edit($tagId, $this->request->data);
 			if ($result === true) {
-				$this->Session->setFlash(__d('tags', 'Tag saved.'));
+				$this->Session->setFlash(__d('tags', 'Tag saved.'), 'flash_success');
 				$this->redirect(array('action' => 'index'));
 			} else {
 				$this->request->data = $result;
 			}
 		} catch (Exception $e) {
-			$this->Session->setFlash($e->getMessage());
+			$this->Session->setFlash($e->getMessage(), 'flash_danger');
 			$this->redirect(array('action' => 'index'));
 		}
 
@@ -141,11 +107,11 @@ class TagsController extends TagsAppController {
  * @param string tag UUID
  * @return void
  */
-	public function admin_delete($id = null) {
+	public function delete($id = null) {
 		if ($this->{$this->modelClass}->delete($id)) {
-			$this->Session->setFlash(__d('tags', 'Tag deleted.'));
+			$this->Session->setFlash(__d('tags', 'Tag deleted.'), 'flash_success');
 		} else {
-			$this->Session->setFlash(__d('tags', 'Invalid Tag.'));
+			$this->Session->setFlash(__d('tags', 'Invalid Tag.'), 'flash_warning');
 		}
 		$this->redirect(array('action' => 'index'));
 	}
