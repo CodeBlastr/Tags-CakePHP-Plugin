@@ -1,13 +1,14 @@
 <?php
 /**
- * Copyright 2009-2010, Cake Development Corporation (http://cakedc.com)
+ * Copyright 2009-2014, Cake Development Corporation (http://cakedc.com)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright Copyright 2009-2010, Cake Development Corporation (http://cakedc.com)
+ * @copyright Copyright 2009-2014, Cake Development Corporation (http://cakedc.com)
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+App::uses('TagsAppModel', 'Tags.Model');
 
 /**
  * Tagged model
@@ -16,13 +17,6 @@
  * @subpackage tags.models
  */
 class Tagged extends TagsAppModel {
-
-/**
- * Name
- *
- * @var string
- */
-	public $name = 'Tagged';
 
 /**
  * Table that is used
@@ -135,7 +129,7 @@ class Tagged extends TagsAppModel {
 
 /**
  * Find all the Model entries tagged with a given tag
- * 
+ *
  * The query must contain a Model name, and can contain a 'by' key with the Tag keyname to filter the results
  * <code>
  * $this->Article->Tagged->find('tagged', array(

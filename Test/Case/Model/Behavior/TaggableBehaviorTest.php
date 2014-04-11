@@ -1,15 +1,13 @@
 <?php
 /**
- * Copyright 2009-2010, Cake Development Corporation (http://cakedc.com)
+ * Copyright 2009-2014, Cake Development Corporation (http://cakedc.com)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright Copyright 2009-2010, Cake Development Corporation (http://cakedc.com)
+ * @copyright Copyright 2009-2014, Cake Development Corporation (http://cakedc.com)
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
-
-App::import('Core', 'Model');
 
 /**
  * Article model
@@ -18,13 +16,6 @@ App::import('Core', 'Model');
  * @subpackage tags.tests.cases.behaviors
  */
 class Article extends CakeTestModel {
-
-/**
- * Model name
- *
- * @var string
- */
-	public $name = 'Article';
 
 /**
  * Use table
@@ -75,7 +66,7 @@ class Article extends CakeTestModel {
  * @package tags
  * @subpackage tags.tests.cases.behaviors
  */
-class TaggableTest extends CakeTestCase {
+class TaggableBehaviorTest extends CakeTestCase {
 
 /**
  * Plugin name used for fixtures loading
@@ -108,7 +99,9 @@ class TaggableTest extends CakeTestCase {
  * @return void
  */
 	public function setUp() {
+		parent::setUp();
 		$this->Article = ClassRegistry::init('Article');
+		Configure::write('Config.language', 'eng');
 		$this->Article->Behaviors->attach('Tags.Taggable', array());
 	}
 
@@ -118,13 +111,14 @@ class TaggableTest extends CakeTestCase {
  * @return void
  */
 	public function tearDown() {
+		parent::tearDown();
 		unset($this->Article);
 		ClassRegistry::flush();
 	}
 
 /**
  * Test the occurrence cache
- * 
+ *
  * @return void
  */
 	public function testOccurrenceCache() {
@@ -143,7 +137,7 @@ class TaggableTest extends CakeTestCase {
 			'conditions' => array(
 				'Tag.keyname' => 'cakephp')));
 
-		$this->assertEqual($resultAfter['Tag']['occurrence'] - $resultBefore['Tag']['occurrence'], 1);
+		$this->assertEquals($resultAfter['Tag']['occurrence'] - $resultBefore['Tag']['occurrence'], 1);
 
 		// updating the record to not have the cakephp tag anymore, decreases the occurrence
 		$data = array('id' => $this->Article->id, 'title' => 'Test Article', 'tags' => 'php, something, else');
@@ -152,7 +146,7 @@ class TaggableTest extends CakeTestCase {
 			'contain' => array(),
 			'conditions' => array(
 				'Tag.keyname' => 'cakephp')));
-		$this->assertEqual($resultAfter['Tag']['occurrence'], 1);
+		$this->assertEquals($resultAfter['Tag']['occurrence'], 1);
 	}
 
 /**
@@ -175,50 +169,54 @@ class TaggableTest extends CakeTestCase {
 			'contain' => array('Tag'),
 			'conditions' => array(
 				'id' => 'article-1')));
+
 		$this->assertTrue(!empty($result['Article']['tags']));
+		$this->assertEquals(3, count($result['Tag']));
 
 
 		$data['tags'] = 'cakephp:foo, developer, cakephp:developer, cakephp:php';
 		$this->Article->save($data, false);
 		$result = $this->Article->Tag->find('all', array(
 			'recursive' => -1,
-			'order' => 'Tag.identifier DESC',
+			'order' => 'Tag.identifier DESC, Tag.name ASC',
 			'conditions' => array(
 				'Tag.identifier' => 'cakephp')));
+
 		$result = Set::extract($result, '{n}.Tag.keyname');
-		$this->assertEqual($result, array(
-			'foo', 'developer', 'php'));
+		$this->assertEquals($result, array(
+			'developer', 'foo', 'php'));
 
 		$this->assertFalse($this->Article->saveTags('foo, bar', null));
 		$this->assertFalse($this->Article->saveTags(array('foo', 'bar'), 'something'));
 	}
 
 /**
- * Tests that toggling taggedCounter will update the time_tagged counter in the tagged table 
+ * Tests that toggling taggedCounter will update the time_tagged counter in the tagged table
  *
  * @return void
  */
-	function testSaveTimesTagged() {
+	public function testSaveTimesTagged() {
 		$this->Article->Behaviors->Taggable->settings['Article']['taggedCounter'] = true;
 		$tags = 'foo, bar , test';
 		$this->assertTrue($this->Article->saveTags($tags, 'article-1', false));
 		$this->assertTrue($this->Article->saveTags($tags, 'article-1', false));
 
-		$result =  $this->Article->Tagged->find('all', array(
-			'conditions' => array('model' => 'Article')));
-		
+		$result = $this->Article->Tagged->find('all', array(
+			'conditions' => array('model' => 'Article'),
+			'contain' => array('Tag'),
+		));
 		$fooCount = Set::extract('/Tag[keyname=foo]/../Tagged/times_tagged', $result);
-		$this->assertEqual($fooCount, array(2));
-		
+		$this->assertEquals($fooCount, array(2));
+
 		$barCount = Set::extract('/Tag[keyname=bar]/../Tagged/times_tagged', $result);
-		$this->assertEqual($barCount, array(2));
+		$this->assertEquals($barCount, array(2));
 
 		$testCount = Set::extract('/Tag[keyname=test]/../Tagged/times_tagged', $result);
-		$this->assertEqual($testCount, array(2));
+		$this->assertEquals($testCount, array(2));
 	}
 
 /**
- * Testings Taggable::tagArrayToString()
+ * Testing Taggable::tagArrayToString()
  *
  * @return void
  */
@@ -232,10 +230,22 @@ class TaggableTest extends CakeTestCase {
 		$result = $this->Article->tagArrayToString($result['Tag']);
 		$this->assertTrue(!empty($result));
 		$this->assertInternalType('string', $result);
+		$this->assertEquals($result, 'test, bar, foo');
 
 		$result = $this->Article->tagArrayToString();
 		$this->assertTrue(empty($result));
 		$this->assertInternalType('string', $result);
+
+		$data['tags'] = 'cakephp:foo, cakephp:bar';
+		$this->Article->save($data, false);
+		$result = $this->Article->find('first', array(
+			'conditions' => array(
+				'id' => 'article-1')));
+
+		$result = $this->Article->tagArrayToString($result['Tag']);
+		$this->assertTrue(!empty($result));
+		$this->assertInternalType('string', $result);
+		$this->assertEquals($result, 'cakephp:bar, cakephp:foo, bar, foo');
 	}
 
 /**
@@ -245,10 +255,10 @@ class TaggableTest extends CakeTestCase {
  */
 	public function testMultibyteKey() {
 		$result = $this->Article->multibyteKey('this is _ a Nice ! - _ key!');
-		$this->assertEqual('thisisanicekey', $result);
+		$this->assertEquals('thisisanicekey', $result);
 
 		$result = $this->Article->multibyteKey('Äü-Ü_ß');
-		$this->assertEqual('äüüß', $result);
+		$this->assertEquals('äüüß', $result);
 	}
 
 /**
@@ -296,6 +306,71 @@ class TaggableTest extends CakeTestCase {
 	public function testGettingTagCloudThroughAssociation() {
 		$result = $this->Article->Tagged->find('cloud');
 		$this->assertTrue(is_array($result) && !empty($result));
+	}
+
+/**
+ * testSavingEmptyTagsDeleteAssociatedTags
+ *
+ * @return void
+ */
+	public function testSavingEmptyTagsDeleteAssociatedTags() {
+		$this->Article->Behaviors->Taggable->settings['Article']['deleteTagsOnEmptyField'] = true;
+		$data = $this->Article->findById('article-1');
+		$data['Article']['tags'] = '';
+		$this->Article->save($data, false);
+		$result = $this->Article->find('first', array(
+			'conditions' => array('id' => 'article-1')
+		));
+
+		$this->assertEmpty($result['Tag']);
+	}
+
+/**
+ * testSavingEmptyTagsDoNotDeleteAssociatedTags
+ *
+ * @return void
+ */
+	public function testSavingEmptyTagsDoNotDeleteAssociatedTags() {
+		$this->Article->Behaviors->Taggable->settings['Article']['deleteTagsOnEmptyField'] = false;
+		$data = $this->Article->findById('article-1');
+		$data['Article']['tags'] = '';
+		$this->Article->save($data, false);
+		$result = $this->Article->find('first', array(
+			'conditions' => array('id' => 'article-1')
+		));
+
+		$this->assertNotEmpty($result['Tag']);
+	}
+
+/**
+ * testSavingTagsDoesNotCreateEmptyRecords
+ *
+ * @return void
+ */
+	public function testSavingTagsDoesNotCreateEmptyRecords() {
+		$count = $this->Article->Tag->find('count', array(
+			'conditions' => array(
+				'Tag.name' => '',
+				'Tag.keyname' => '',
+			)
+		));
+		$this->assertEquals($count, 0);
+
+		$data['id'] = 'article-1';
+		$data['tags'] = 'foo, bar, test';
+		$this->Article->save($data, false);
+		$result = $this->Article->find('first', array(
+			'conditions' => array(
+				'id' => 'article-1')
+		));
+
+		$count = $this->Article->Tag->find('count', array(
+			'conditions' => array(
+				'Tag.name' => '',
+				'Tag.keyname' => '',
+			)
+		));
+		$this->assertEquals($count, 0);
 	}
 
 }
