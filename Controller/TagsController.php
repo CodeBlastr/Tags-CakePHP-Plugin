@@ -70,7 +70,7 @@ class TagsController extends TagsAppController {
 	public function add() {
 		if (!empty($this->request->data)) {
 			if ($this->{$this->modelClass}->add($this->request->data)) {
-				$this->Session->setFlash(__d('tags', 'The Tags has been saved.'), 'flash_success');
+				$this->Session->setFlash(__d('tags', 'The Tags have been saved.'), 'flash_success');
 				$this->redirect(array('action' => 'index'));
 			}
 		}

@@ -26,6 +26,23 @@ class TagCloudHelper extends AppHelper {
  */
 	public $helpers = array('Html');
 
+ 	public function find($type = 'first', $params = array()) {
+		App::uses('Tag', 'Tags.Model');
+		$this->Tag = new Tag();
+ 		return $this->Tag->find($type, $params);
+ 	}
+
+	public function tagList($tags) {
+		if (empty($tags)) {
+			return '';
+		}
+		$tagList = '';
+		foreach ($tags as $tag) {
+			$tagList .= $this->Html->tag('li', $tag['Tag']['name']);
+		}
+		return $tagList;
+	}
+
 /**
  * Method to output a tag-cloud formatted based on the weight of the tags
  *
@@ -56,7 +73,8 @@ class TagCloudHelper extends AppHelper {
 			'url' => array(
 				'controller' => 'search'
 			),
-			'named' => 'by'
+			'named' => 'by',
+			'class' => ''
 		);
 		$options = array_merge($defaults, $options);
 
@@ -83,7 +101,7 @@ class TagCloudHelper extends AppHelper {
 			$size = $tag[$options['tagModel']]['size'] = ceil($size);
 
 			$cloud .= $this->_replace($options['before'], $size);
-			$cloud .= $this->Html->link($tag[$options['tagModel']]['name'], $this->_tagUrl($tag, $options), array('id' => 'tag-' . $tag[$options['tagModel']]['id'])) . ' ';
+			$cloud .= $this->Html->link($tag[$options['tagModel']]['name'], $this->_tagUrl($tag, $options), array('class'=>$options['class'], 'id' => 'tag-' . $tag[$options['tagModel']]['id'])) . ' ';
 			$cloud .= $this->_replace($options['after'], $size);
 		}
 

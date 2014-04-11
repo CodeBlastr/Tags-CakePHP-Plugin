@@ -32,6 +32,18 @@ class Tag extends TagsAppModel {
 	);
 
 /**
+ * belongsTo associations
+ *
+ * @var array
+ */
+	public $belongsTo = array(
+		'Creator' => array(
+			'className' => 'Users.User',
+			'foreignKey' => 'creator_id'
+			)
+		);
+
+/**
  * HABTM associations
  *
  * @var array $hasAndBelongsToMany

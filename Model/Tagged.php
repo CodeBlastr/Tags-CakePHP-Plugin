@@ -41,8 +41,13 @@ class Tagged extends TagsAppModel {
  */
 	public $belongsTo = array(
 		'Tag' => array(
-			'className' => 'Tags.Tag'));
-
+			'className' => 'Tags.Tag'
+			),
+		'Creator' => array(
+			'className' => 'Users.User',
+			'foreignKey' => 'creator_id'
+			)
+		);
 /**
  * Returns a tag cloud
  *
@@ -62,8 +67,8 @@ class Tagged extends TagsAppModel {
 		if ($state == 'before') {
 			// Support old code without the occurrence cache
 			if (!$this->Tag->hasField('occurrence') || isset($query['occurrenceCache']) && $query['occurrenceCache'] === false) {
-				$fields = 'Tagged.tag_id, Tag.id, Tag.identifier, Tag.name, Tag.keyname, Tag.weight, COUNT(*) AS occurrence';
-				$groupBy = array('Tagged.tag_id', 'Tag.id', 'Tag.identifier', 'Tag.name', 'Tag.keyname', 'Tag.weight');
+				$fields = 'Tagged.tag_id, Tag.id, Tag.identifier, Tag.name, Tag.keyname, COUNT(*) AS occurrence';
+				$groupBy = array('Tagged.tag_id', 'Tag.id', 'Tag.identifier', 'Tag.name', 'Tag.keyname');
 			} else {
 				// This is related to https://github.com/CakeDC/tags/issues/10 to work around a limitation of postgres
 				$field = $this->getDataSource()->fields($this->Tag);
