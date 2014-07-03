@@ -23,6 +23,8 @@ class TagsController extends TagsAppController {
  * @var string
  */
 	public $name = 'Tags';
+	
+	public $uses = 'Tags.Tag';
 
 /**
  * Components
