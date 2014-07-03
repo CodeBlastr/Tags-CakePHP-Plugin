@@ -1,23 +1,23 @@
 <?php
 /**
- * Copyright 2009-2010, Cake Development Corporation (http://cakedc.com)
+ * Copyright 2009-2014, Cake Development Corporation (http://cakedc.com)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright Copyright 2009-2010, Cake Development Corporation (http://cakedc.com)
+ * @copyright Copyright 2009-2014, Cake Development Corporation (http://cakedc.com)
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
 
-App::import('Model', 'Tags.Tag');
+App::uses('Tag', 'Tags.Model');
 
 /**
- * TagTestCase
+ * TagTest
  *
  * @package tags
  * @subpackage tags.tests.cases.models
  */
-class TagTestCase extends CakeTestCase {
+class TagTest extends CakeTestCase {
 
 /**
  * Tag Instance
@@ -41,6 +41,7 @@ class TagTestCase extends CakeTestCase {
  * @return void
  */
 	public function setUp() {
+		parent::setUp();
 		$this->Tag = ClassRegistry::init('Tags.Tag');
 	}
 
@@ -50,6 +51,7 @@ class TagTestCase extends CakeTestCase {
  * @return void
  */
 	public function tearDown() {
+		parent::tearDown();
 		unset($this->Tag);
 	}
 
@@ -82,7 +84,7 @@ class TagTestCase extends CakeTestCase {
 				'article_occurrence' => 1,
 				'created'  => '2008-06-02 18:18:11',
 				'modified'  => '2008-06-02 18:18:37'));
-		$this->assertEqual($results, $expected);
+		$this->assertEquals($results, $expected);
 	}
 
 /**
@@ -93,9 +95,9 @@ class TagTestCase extends CakeTestCase {
 	public function testView() {
 		$result = $this->Tag->view('cakephp');
 		$this->assertTrue(is_array($result));
-		$this->assertEqual($result['Tag']['keyname'], 'cakephp');
+		$this->assertEquals($result['Tag']['keyname'], 'cakephp');
 
-		$this->expectException('Exception');
+		$this->expectException('CakeException');
 		$this->Tag->view('invalid-key!!!');
 	}
 
@@ -126,8 +128,8 @@ class TagTestCase extends CakeTestCase {
  */
 	public function testEdit() {
 		$this->assertNull($this->Tag->edit('tag-1'));
-		$this->assertEqual($this->Tag->data['Tag']['id'], 'tag-1');
-		
+		$this->assertEquals($this->Tag->data['Tag']['id'], 'tag-1');
+
 		$data = array(
 			'Tag' => array(
 				'id' => 'tag-1',
@@ -145,9 +147,9 @@ class TagTestCase extends CakeTestCase {
 				'id' => 'tag-1',
 				'name' => 'CAKEPHP',
 				'keyname' => ''));
-		$this->assertEqual($this->Tag->edit('tag-1', $data), $data);
-		
-		$this->expectException('Exception');
+		$this->assertEquals($this->Tag->edit('tag-1', $data), $data);
+
+		$this->expectException('CakeException');
 		$this->assertTrue($this->Tag->edit('invalid-id', array()));
 	}
 }

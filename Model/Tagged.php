@@ -1,13 +1,14 @@
 <?php
 /**
- * Copyright 2009-2010, Cake Development Corporation (http://cakedc.com)
+ * Copyright 2009-2014, Cake Development Corporation (http://cakedc.com)
  *
  * Licensed under The MIT License
  * Redistributions of files must retain the above copyright notice.
  *
- * @copyright Copyright 2009-2010, Cake Development Corporation (http://cakedc.com)
+ * @copyright Copyright 2009-2014, Cake Development Corporation (http://cakedc.com)
  * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
  */
+App::uses('TagsAppModel', 'Tags.Model');
 
 /**
  * Tagged model
@@ -16,13 +17,6 @@
  * @subpackage tags.models
  */
 class Tagged extends TagsAppModel {
-
-/**
- * Name
- *
- * @var string
- */
-	public $name = 'Tagged';
 
 /**
  * Table that is used
@@ -47,8 +41,13 @@ class Tagged extends TagsAppModel {
  */
 	public $belongsTo = array(
 		'Tag' => array(
-			'className' => 'Tags.Tag'));
-
+			'className' => 'Tags.Tag'
+			),
+		'Creator' => array(
+			'className' => 'Users.User',
+			'foreignKey' => 'creator_id'
+			)
+		);
 /**
  * Returns a tag cloud
  *
@@ -68,8 +67,8 @@ class Tagged extends TagsAppModel {
 		if ($state == 'before') {
 			// Support old code without the occurrence cache
 			if (!$this->Tag->hasField('occurrence') || isset($query['occurrenceCache']) && $query['occurrenceCache'] === false) {
-				$fields = 'Tagged.tag_id, Tag.id, Tag.identifier, Tag.name, Tag.keyname, Tag.weight, COUNT(*) AS occurrence';
-				$groupBy = array('Tagged.tag_id', 'Tag.id', 'Tag.identifier', 'Tag.name', 'Tag.keyname', 'Tag.weight');
+				$fields = 'Tagged.tag_id, Tag.id, Tag.identifier, Tag.name, Tag.keyname, COUNT(*) AS occurrence';
+				$groupBy = array('Tagged.tag_id', 'Tag.id', 'Tag.identifier', 'Tag.name', 'Tag.keyname');
 			} else {
 				// This is related to https://github.com/CakeDC/tags/issues/10 to work around a limitation of postgres
 				$field = $this->getDataSource()->fields($this->Tag);
@@ -135,7 +134,7 @@ class Tagged extends TagsAppModel {
 
 /**
  * Find all the Model entries tagged with a given tag
- * 
+ *
  * The query must contain a Model name, and can contain a 'by' key with the Tag keyname to filter the results
  * <code>
  * $this->Article->Tagged->find('tagged', array(
