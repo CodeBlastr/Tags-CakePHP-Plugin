@@ -17,7 +17,7 @@ App::uses('TagsAppModel', 'Tags.Model');
  * @subpackage tags.models
  * @property Tagged Tagged
  */
-class Tag extends TagsAppModel {
+class AppTag extends TagsAppModel {
 
 /**
  * hasMany associations
@@ -133,4 +133,8 @@ class Tag extends TagsAppModel {
 		}
 	}
 
+}
+
+if (!isset($refuseInit)) {
+	class Tag extends AppTag {}
 }
