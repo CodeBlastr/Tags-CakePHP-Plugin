@@ -1,29 +1,18 @@
-<?php
-/**
- * Copyright 2009-2014, Cake Development Corporation (http://cakedc.com)
- *
- * Licensed under The MIT License
- * Redistributions of files must retain the above copyright notice.
- *
- * @copyright Copyright 2009-2014, Cake Development Corporation (http://cakedc.com)
- * @license MIT License (http://www.opensource.org/licenses/mit-license.php)
- */
-echo $this->Html->css('/tags/css/bootstrap-tagsinput');
-echo $this->Html->script('/tags/js/bootstrap-tagsinput.min');
-?>
 <div class="tags form">
-<?php echo $this->Form->create('Tag');?>
- 		<legend><?php printf(__d('tags', 'Add %s'), __d('tags', 'Tag')); ?></legend>
-		<div class="text-muted">Tags <small>(list of tags separated by comma)</small></div>
-	<?php
-		echo $this->Form->input('tags', array(
-			'label' => false,
-			'data-role' => 'tagsinput'));
-	?>
-<?php echo $this->Form->end(__d('tags', 'Submit'));?>
+	<?php echo $this->Form->create('Tag');?>
+	 		<legend><?php echo __('Add Tag'); ?></legend>
+			<div class="text-muted">Tags <small>(list of tags separated by comma)</small></div>
+		<?php echo $this->Form->input('tags', array('label' => false, 'data-role' => 'tagsinput')); ?>
+	<?php echo $this->Form->end(__d('tags', 'Submit'));?>
 </div>
-<div class="actions">
-	<ul>
-		<li><?php echo $this->Html->link(sprintf(__d('tags', 'List %s'), __d('tags', 'Tags')), array('action' => 'index'));?></li>
-	</ul>
-</div>
+
+<?php
+// set the contextual menu items
+$this->set('context_menu', array('menus' => array(
+	array(
+		'heading' => 'Tags',
+		'items' => array(
+			 $this->Html->link(__('List'), array('action' => 'index')),
+			 )
+		)
+	)));
