@@ -407,6 +407,8 @@ class TaggableBehavior extends ModelBehavior {
 /**
  * afterFind Callback
  *
+ * This seems to be used for incoming data????? I wish there were some comments.
+ * 
  * @param Model $model
  * @param array $results
  * @param boolean $primary
